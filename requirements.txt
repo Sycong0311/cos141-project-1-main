@@ -1,0 +1,4 @@
+flask==2.1.3
+Flask-MySQL
+pyyaml
+Werkzeug==2.2.2
