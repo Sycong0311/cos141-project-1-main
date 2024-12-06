@@ -1,0 +1,93 @@
+{% extends 'layout.html' %}
+{% block title %} Profile {% endblock %}
+{% block content %}
+
+
+
+<div class="profile-container">
+    <h2>User Profile</h2>
+    <div class="profile-card">
+        <table>
+            <tr>
+                <td>Name:</td>
+                <td>{{ account['fullname'] | e }}</td>
+            </tr>
+            <tr>
+                <td>Username:</td>
+                <td>{{ account['username'] | e }}</td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td>********</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td>{{ account['email'] | e }}</td>
+            </tr>
+        </table>
+        <button class="logout-btn">Logout</button>
+    </div>
+</div>
+
+<style>
+    
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .profile-container {
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        margin: 50px auto;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .profile-card {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-spacing: 0;
+        margin-bottom: 20px;
+    }
+
+    td {
+        text-align: left;
+        padding: 8px 0;
+        color: #555;
+    }
+
+    td:first-child {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .logout-btn {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .logout-btn:hover {
+        background-color: #d32f2f;
+    }
+</style>
+
+{% endblock %}

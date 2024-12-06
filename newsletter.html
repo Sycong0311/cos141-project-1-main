@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>newsletter</title>
+    </head>
+
+    <body>
+        <p>Newsletter</p>
+        Fullname: {{ fullname }}
+
+        <form action="{{ url_for('newsletter') }}" method="post" autocomplete="off">
+           
+            <p>
+                <label>Your Name</label>
+                <input type="text" name="fullname" id="fullname" placeholder="Enter your Name" />
+            </p>
+
+            <p>
+                <label>Your Email</label>
+                <input type="text" name="email" id="email" placeholder="Enter your Email" />
+            </p>
+
+            
+            <div id="msg">{{ msg }}</div>
+            <input type="submit" value="Register" name="" />
+        
+            <p>
+                <a href="{{ url_for('login') }}">Login</a>
+            </p>
+            
+        </form>
+
+    </body>
+</html>

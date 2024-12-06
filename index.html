@@ -1,0 +1,113 @@
+<html></html>
+    <head>
+        <title>Login</title>
+    </head>
+
+    <body>
+        <main>
+            <h1>[Feitian College] Login</h1>
+           
+
+            <form class="form-group" action="{{ url_for('login') }}" method="post">
+
+                <p>
+
+                    <input type="text" name="username" placeholder="Username" id="username" required />
+                </p>
+
+                <p>
+ 
+                    <input type="password" class="form-control" name="password" placeholder="Password" id="password" required />
+                </p>
+
+                
+                <div>
+                    <button input type="submit" value="Login" name=""> Login</button>
+                </div> 
+                
+
+            </form>
+
+            <div id="msg">{{ msg }}</div>
+                <p class="signup-text">
+                    <a href="{{ url_for('register') }}">Don't have an account? Sign up</a>
+                </p>
+            </div>
+        </main>
+    </body>
+
+</html>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f8fb;
+        height: 100vh; /* Full viewport height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    main {
+        width: 350px;
+        padding: 40px 30px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center; /* Center-align content */
+    }
+
+    h1 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    button {
+        padding: 10px;
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .signup-text {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .signup-text a:hover {
+        text-decoration: underline;
+    }
+</style>
