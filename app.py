@@ -3,6 +3,7 @@ from flaskext.mysql import MySQL
 import pymysql
 import re
 import yaml
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 mysql = MySQL()
@@ -17,15 +18,12 @@ app.config['MYSQL_DATABASE_DB'] = db['mysql_db']
 
 mysql.init_app(app)
 
-# change this to your secret key
-# (can be anything, it's for extra protection)
+# change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = "feitian"
-
 
 # http://localhost:5000/login/ - this will be the login page
 @app.route("/login/", methods=["GET", "POST"])
 def login():
-
     # connect
     conn = mysql.connect()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -44,26 +42,24 @@ def login():
 
         # check if account exists using MySQL
         cursor.execute(
-            "SELECT * FROM accounts WHERE username = %s AND password = %s",
-            (username, password),
+            "SELECT * FROM accounts WHERE username = %s", (username)
         )
 
         # fetch one record and return result
         account = cursor.fetchone()
 
-        # if account exists in accounts table in out database
-        if account:
+        # if account exists in accounts table in our database
+        if account and check_password_hash(account["password"], password):
             # create session data, we can access this data in other routes
             session["loggedin"] = True
             session["id"] = account["id"]
             session["username"] = account["username"]
 
             # redirect to home page
-            # return 'Logged in successfully!'
             return redirect(url_for("home"))
 
         else:
-            # account doesnt exist or username/password incorrect
+            # account doesn't exist or username/password incorrect
             msg = "Incorrect username/password!"
 
     return render_template("index.html", msg=msg)
@@ -104,10 +100,11 @@ def register():
         elif not username or not password or not email:
             msg = "Please fill out the form!"
         else:
-            # account doesnt exists and the form data is valid, now insert new account into accounts table
+            # account doesn't exist and the form data is valid, now insert new account into accounts table
+            hashed_password = generate_password_hash(password)  # hash the password
             cursor.execute(
-                "INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s)",
-                (fullname, username, password, email),
+                "INSERT INTO accounts (fullname, username, password, email) VALUES (%s, %s, %s, %s)",
+                (fullname, username, hashed_password, email),
             )
 
             conn.commit()
@@ -122,7 +119,7 @@ def register():
 
 
 # http://localhost:5000/home - this will be the home page, only accessible for loggedin users
-@app.route("/")
+@app.route("/home")
 def home():
     # check if user is loggedin
     if "loggedin" in session:
@@ -164,23 +161,70 @@ def profile():
     # user is not loggedin redirect to login page
     return redirect(url_for("login"))
 
-@app.route("/newsletter", methods=["GET","POST"])
+
+# http://localhost:5000/newsletter - this will be the newsletter page
+@app.route("/newsletter", methods=["GET", "POST"])
 def newsletter():
+    msg = ""
     if request.method == "POST":
-        fullname =  request.form["fullname"]
+        fullname = request.form["fullname"]
         email = request.form["email"]
 
+        # connect to database
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute(
-            "INSERT INTO users VALUES (NULL, %s, %s)",(fullname,email),
-
+            "INSERT INTO users VALUES (NULL, %s, %s)", 
+            (fullname, email),
         )
         conn.commit()
+
         msg = "Successfully inserted into users table"
     else:
-        fullname = "Cong"
+        fullname = "cong"
     return render_template("newsletter.html", fullname=fullname, msg=msg)
+
+
+# http://localhost:5000/settings - this will be the settings page, only accessible for loggedin users
+@app.route("/settings", methods=["GET", "POST"])
+def settings():
+    # check if user is loggedin
+    if "loggedin" in session:
+        # connect to database
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # check if the user exists
+        cursor.execute("SELECT * FROM accounts WHERE id = %s", [session["id"]])
+        account = cursor.fetchone()
+
+        msg = ""
+
+        if request.method == "POST":
+            # Get new settings from the form (for example: updating email, password)
+            new_email = request.form.get("email")
+            new_password = request.form.get("password")
+
+            # Validate and update settings in database if new values are provided
+            if new_email and re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
+                cursor.execute("UPDATE accounts SET email = %s WHERE id = %s", (new_email, session["id"]))
+                conn.commit()
+                msg = "Accounts setting updated successfully!"
+            
+            if new_password:
+                # Hash the new password before storing it
+                hashed_password = generate_password_hash(new_password)
+                cursor.execute("UPDATE accounts SET password = %s WHERE id = %s", (hashed_password, session["id"]))
+                conn.commit()
+                msg = "Accounts setting updated successfully!"
+            else:
+                msg = "Invalid input or no changes made!"
+
+        # render settings page with current user data and any messages
+        return render_template("settings.html", account=account, msg=msg)
+
+    # if the user is not logged in, redirect to login page
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
